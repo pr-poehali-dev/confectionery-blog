@@ -20,6 +20,7 @@ interface Recipe {
   ingredients: string[];
   steps: string[];
   views?: number;
+  isPremium?: boolean;
 }
 
 interface Comment {
@@ -37,6 +38,7 @@ const recipes: Recipe[] = [
     title: 'Элегантный розовый торт',
     description: 'Нежный бисквитный торт с кремом из маскарпоне и ягодами. Идеален для особых случаев.',
     category: 'Торты',
+    isPremium: true,
     difficulty: 'Сложный',
     time: '3 часа',
     servings: 12,
@@ -128,6 +130,9 @@ const Index = () => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('Все');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
+  const [showDonateDialog, setShowDonateDialog] = useState(false);
   const [recipeViews, setRecipeViews] = useState<{ [key: number]: number }>({
     1: 1247,
     2: 892,
@@ -169,6 +174,10 @@ const Index = () => {
   };
 
   const handleOpenRecipe = (recipe: Recipe) => {
+    if (recipe.isPremium && !isPremiumUser) {
+      setShowPremiumDialog(true);
+      return;
+    }
     setSelectedRecipe(recipe);
     setRecipeViews(prev => ({
       ...prev,
@@ -235,10 +244,24 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
                 </button>
               ))}
             </div>
-            <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
-              <Icon name="BookPlus" size={18} className="mr-2" />
-              Добавить рецепт
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant={isPremiumUser ? 'default' : 'outline'}
+                onClick={() => setShowPremiumDialog(true)}
+                className={isPremiumUser ? 'bg-gradient-to-r from-accent to-secondary' : 'border-accent text-accent hover:bg-accent/10'}
+              >
+                <Icon name="Crown" size={18} className="mr-2" />
+                {isPremiumUser ? 'Premium' : 'Получить Premium'}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setShowDonateDialog(true)}
+                className="border-primary hover:bg-primary/10"
+              >
+                <Icon name="Heart" size={18} className="mr-2" />
+                Поддержать
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
@@ -282,6 +305,27 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
             </div>
           </section>
 
+          {!isPremiumUser && (
+            <section className="container mx-auto px-4 pb-8">
+              <Card className="p-6 bg-gradient-to-r from-accent/10 via-secondary/10 to-primary/10 border-accent">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center">
+                      <Icon name="Sparkles" size={32} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-1">Рекламный блок</h3>
+                      <p className="text-sm text-muted-foreground">Профессиональные формы для выпечки со скидкой 25%</p>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="border-accent hover:bg-accent/10">
+                    Перейти в магазин
+                  </Button>
+                </div>
+              </Card>
+            </section>
+          )}
+
           <section className="container mx-auto px-4 pb-20">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredRecipes.map((recipe, index) => (
@@ -297,6 +341,14 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
                       alt={recipe.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
+                    {recipe.isPremium && (
+                      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+                        <div className="text-center text-white">
+                          <Icon name="Crown" size={48} className="mx-auto mb-2 text-accent" />
+                          <p className="font-bold">Premium</p>
+                        </div>
+                      </div>
+                    )}
                     <div className="absolute top-4 left-4 right-4 flex justify-between">
                       <Badge className="bg-accent text-accent-foreground">
                         {recipe.category}
@@ -554,6 +606,158 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
           )}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <Icon name="Crown" size={28} className="text-accent" />
+              Premium подписка
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-muted-foreground">
+              Получите доступ ко всем премиум-рецептам и эксклюзивному контенту!
+            </p>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <Icon name="Check" size={20} className="text-primary mt-0.5" />
+                <span>Безлимитный доступ к 50+ премиум-рецептам</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <Icon name="Check" size={20} className="text-primary mt-0.5" />
+                <span>Видео мастер-классы от шеф-кондитера</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <Icon name="Check" size={20} className="text-primary mt-0.5" />
+                <span>Персональные консультации в чате</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <Icon name="Check" size={20} className="text-primary mt-0.5" />
+                <span>Отсутствие рекламы на сайте</span>
+              </div>
+            </div>
+            <Card className="p-4 bg-gradient-to-br from-accent/10 to-secondary/10 border-accent">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-lg font-semibold">Месячная подписка</span>
+                <div className="text-right">
+                  <div className="text-2xl font-bold">490₽</div>
+                  <div className="text-xs text-muted-foreground">в месяц</div>
+                </div>
+              </div>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-primary/10 to-secondary/10 border-primary">
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <span className="text-lg font-semibold">Годовая подписка</span>
+                  <Badge className="ml-2 bg-accent">-40%</Badge>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold">2990₽</div>
+                  <div className="text-xs text-muted-foreground">249₽/мес</div>
+                </div>
+              </div>
+            </Card>
+            <Button 
+              onClick={() => {
+                setIsPremiumUser(true);
+                setShowPremiumDialog(false);
+              }}
+              className="w-full bg-gradient-to-r from-accent to-secondary hover:opacity-90 text-lg h-12"
+            >
+              <Icon name="Crown" size={20} className="mr-2" />
+              Оформить Premium
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Отменить подписку можно в любой момент
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDonateDialog} onOpenChange={setShowDonateDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <Icon name="Heart" size={28} className="text-primary" />
+              Поддержать блог
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-muted-foreground">
+              Ваша поддержка помогает создавать больше качественных рецептов и улучшать блог!
+            </p>
+            <div className="grid grid-cols-3 gap-3">
+              <Button variant="outline" className="h-16 text-lg font-bold">
+                100₽
+              </Button>
+              <Button variant="outline" className="h-16 text-lg font-bold">
+                300₽
+              </Button>
+              <Button variant="outline" className="h-16 text-lg font-bold">
+                500₽
+              </Button>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Своя сумма</label>
+              <Input type="number" placeholder="Введите сумму" className="h-12" />
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Способы оплаты:</p>
+              <div className="flex gap-2">
+                <Badge variant="secondary" className="text-sm">СБП</Badge>
+                <Badge variant="secondary" className="text-sm">Карта</Badge>
+                <Badge variant="secondary" className="text-sm">YooMoney</Badge>
+                <Badge variant="secondary" className="text-sm">Boosty</Badge>
+              </div>
+            </div>
+            <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-lg h-12">
+              <Icon name="Heart" size={20} className="mr-2" />
+              Поддержать
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Спасибо за вашу щедрость! ❤️
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {!isPremiumUser && (
+        <div className="fixed bottom-4 right-4 max-w-sm z-40 animate-fade-in">
+          <Card className="p-4 bg-gradient-to-br from-accent/95 to-secondary/95 border-accent shadow-2xl backdrop-blur">
+            <div className="flex items-start gap-3">
+              <Icon name="Sparkles" size={24} className="text-white flex-shrink-0" />
+              <div>
+                <h3 className="font-bold text-white mb-1">Реклама</h3>
+                <p className="text-sm text-white/90 mb-3">
+                  Кондитерские инструменты премиум-класса со скидкой 20%!
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="secondary" className="text-xs">
+                    Подробнее
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="text-xs text-white hover:bg-white/20"
+                    onClick={() => setShowPremiumDialog(true)}
+                  >
+                    Убрать рекламу
+                  </Button>
+                </div>
+              </div>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="text-white hover:bg-white/20 -mt-2 -mr-2"
+              >
+                <Icon name="X" size={16} />
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       <footer className="border-t border-border mt-20">
         <div className="container mx-auto px-4 py-8 text-center">
