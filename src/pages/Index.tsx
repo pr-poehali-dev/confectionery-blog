@@ -3,6 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 
 interface Recipe {
@@ -16,6 +19,14 @@ interface Recipe {
   servings: number;
   ingredients: string[];
   steps: string[];
+}
+
+interface Comment {
+  id: number;
+  author: string;
+  date: string;
+  text: string;
+  rating: number;
 }
 
 const recipes: Recipe[] = [
@@ -115,10 +126,41 @@ const Index = () => {
   const [activeSection, setActiveSection] = useState('recipes');
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('Все');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [comments, setComments] = useState<{ [key: number]: Comment[] }>({
+    1: [
+      { id: 1, author: 'Анна', date: '10 дек 2024', text: 'Потрясающий рецепт! Торт получился очень нежным и красивым. Гости были в восторге!', rating: 5 },
+      { id: 2, author: 'Мария', date: '8 дек 2024', text: 'Делала на день рождения дочки. Все прошло отлично, спасибо за подробные инструкции!', rating: 5 }
+    ],
+    2: [
+      { id: 3, author: 'Елена', date: '12 дек 2024', text: 'Макаруны получились с первого раза! Очень довольна результатом.', rating: 5 }
+    ]
+  });
+  const [newComment, setNewComment] = useState({ author: '', text: '' });
 
-  const filteredRecipes = selectedCategory === 'Все' 
-    ? recipes 
-    : recipes.filter(recipe => recipe.category === selectedCategory);
+  const filteredRecipes = recipes
+    .filter(recipe => selectedCategory === 'Все' || recipe.category === selectedCategory)
+    .filter(recipe => 
+      recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      recipe.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+  const handleAddComment = () => {
+    if (selectedRecipe && newComment.author && newComment.text) {
+      const comment: Comment = {
+        id: Date.now(),
+        author: newComment.author,
+        date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }),
+        text: newComment.text,
+        rating: 5
+      };
+      setComments(prev => ({
+        ...prev,
+        [selectedRecipe.id]: [...(prev[selectedRecipe.id] || []), comment]
+      }));
+      setNewComment({ author: '', text: '' });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
@@ -165,6 +207,17 @@ const Index = () => {
           </section>
 
           <section className="container mx-auto px-4 pb-8">
+            <div className="max-w-xl mx-auto mb-8">
+              <div className="relative">
+                <Icon name="Search" size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Поиск рецептов..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-12 text-lg"
+                />
+              </div>
+            </div>
             <div className="flex gap-3 justify-center flex-wrap">
               {categories.map((category) => (
                 <Button
@@ -376,6 +429,64 @@ const Index = () => {
                   <Icon name="Share2" size={18} className="mr-2" />
                   Поделиться
                 </Button>
+              </div>
+
+              <Separator className="my-6" />
+
+              <div>
+                <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <Icon name="MessageCircle" size={24} className="text-primary" />
+                  Комментарии ({comments[selectedRecipe.id]?.length || 0})
+                </h3>
+
+                <div className="space-y-4 mb-6">
+                  {comments[selectedRecipe.id]?.map((comment) => (
+                    <Card key={comment.id} className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-semibold">{comment.author}</h4>
+                          <p className="text-sm text-muted-foreground">{comment.date}</p>
+                        </div>
+                        <div className="flex gap-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <Icon
+                              key={i}
+                              name="Star"
+                              size={16}
+                              className={i < comment.rating ? 'text-accent fill-accent' : 'text-muted'}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-muted-foreground">{comment.text}</p>
+                    </Card>
+                  ))}
+                </div>
+
+                <Card className="p-4">
+                  <h4 className="font-semibold mb-4">Оставить комментарий</h4>
+                  <div className="space-y-3">
+                    <Input
+                      placeholder="Ваше имя"
+                      value={newComment.author}
+                      onChange={(e) => setNewComment({ ...newComment, author: e.target.value })}
+                    />
+                    <Textarea
+                      placeholder="Ваш комментарий..."
+                      value={newComment.text}
+                      onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
+                      rows={3}
+                    />
+                    <Button
+                      onClick={handleAddComment}
+                      className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+                      disabled={!newComment.author || !newComment.text}
+                    >
+                      <Icon name="Send" size={18} className="mr-2" />
+                      Отправить
+                    </Button>
+                  </div>
+                </Card>
               </div>
             </div>
           )}
