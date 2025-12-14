@@ -19,6 +19,7 @@ interface Recipe {
   servings: number;
   ingredients: string[];
   steps: string[];
+  views?: number;
 }
 
 interface Comment {
@@ -127,6 +128,11 @@ const Index = () => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('Все');
   const [searchQuery, setSearchQuery] = useState('');
+  const [recipeViews, setRecipeViews] = useState<{ [key: number]: number }>({
+    1: 1247,
+    2: 892,
+    3: 1534
+  });
   const [comments, setComments] = useState<{ [key: number]: Comment[] }>({
     1: [
       { id: 1, author: 'Анна', date: '10 дек 2024', text: 'Потрясающий рецепт! Торт получился очень нежным и красивым. Гости были в восторге!', rating: 5 },
@@ -160,6 +166,50 @@ const Index = () => {
       }));
       setNewComment({ author: '', text: '' });
     }
+  };
+
+  const handleOpenRecipe = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    setRecipeViews(prev => ({
+      ...prev,
+      [recipe.id]: (prev[recipe.id] || 0) + 1
+    }));
+  };
+
+  const handleDownloadPDF = () => {
+    if (!selectedRecipe) return;
+    
+    const content = `
+${selectedRecipe.title}
+${'='.repeat(selectedRecipe.title.length)}
+
+${selectedRecipe.description}
+
+Категория: ${selectedRecipe.category}
+Сложность: ${selectedRecipe.difficulty}
+Время приготовления: ${selectedRecipe.time}
+Порций: ${selectedRecipe.servings}
+
+ИНГРЕДИЕНТЫ:
+${selectedRecipe.ingredients.map((ing, i) => `${i + 1}. ${ing}`).join('\n')}
+
+ПРИГОТОВЛЕНИЕ:
+${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')}
+
+---
+Рецепт с сайта Sweet Kitchen
+© 2024 Sweet Kitchen. Все права защищены.
+    `.trim();
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${selectedRecipe.title.replace(/\s+/g, '_')}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -239,7 +289,7 @@ const Index = () => {
                   key={recipe.id}
                   className="group cursor-pointer overflow-hidden hover:shadow-2xl transition-all duration-300 animate-scale-in border-2 hover:border-primary"
                   style={{ animationDelay: `${index * 100}ms` }}
-                  onClick={() => setSelectedRecipe(recipe)}
+                  onClick={() => handleOpenRecipe(recipe)}
                 >
                   <div className="relative overflow-hidden aspect-[4/3]">
                     <img 
@@ -260,7 +310,7 @@ const Index = () => {
                   <CardContent className="p-6">
                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{recipe.title}</h3>
                     <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{recipe.description}</p>
-                    <div className="flex gap-4 text-sm text-muted-foreground">
+                    <div className="flex gap-4 text-sm text-muted-foreground mb-2">
                       <div className="flex items-center gap-1">
                         <Icon name="ChefHat" size={16} />
                         <span>{recipe.difficulty}</span>
@@ -269,6 +319,10 @@ const Index = () => {
                         <Icon name="Users" size={16} />
                         <span>{recipe.servings} порций</span>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Icon name="Eye" size={14} />
+                      <span>{recipeViews[recipe.id] || 0} просмотров</span>
                     </div>
                     <Button variant="ghost" className="mt-4 w-full text-primary hover:text-secondary">
                       Смотреть рецепт <Icon name="ArrowRight" size={18} className="ml-2" />
@@ -382,6 +436,10 @@ const Index = () => {
                   <Icon name="Users" size={14} className="mr-1" />
                   {selectedRecipe.servings} порций
                 </Badge>
+                <Badge variant="secondary">
+                  <Icon name="Eye" size={14} className="mr-1" />
+                  {recipeViews[selectedRecipe.id] || 0} просмотров
+                </Badge>
               </div>
 
               <p className="text-muted-foreground text-lg">{selectedRecipe.description}</p>
@@ -420,14 +478,18 @@ const Index = () => {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90">
+              <div className="grid grid-cols-3 gap-3 pt-4">
+                <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
                   <Icon name="Heart" size={18} className="mr-2" />
                   В избранное
                 </Button>
-                <Button variant="outline" className="flex-1">
+                <Button variant="outline">
                   <Icon name="Share2" size={18} className="mr-2" />
                   Поделиться
+                </Button>
+                <Button variant="outline" onClick={handleDownloadPDF}>
+                  <Icon name="Download" size={18} className="mr-2" />
+                  Скачать
                 </Button>
               </div>
 
