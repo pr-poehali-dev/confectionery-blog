@@ -133,6 +133,9 @@ const Index = () => {
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
   const [showDonateDialog, setShowDonateDialog] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
   const [recipeViews, setRecipeViews] = useState<{ [key: number]: number }>({
     1: 1247,
     2: 892,
@@ -243,6 +246,17 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
                   {section === 'contact' && 'Контакты'}
                 </button>
               ))}
+              {isAdmin && (
+                <button
+                  onClick={() => setActiveSection('admin')}
+                  className={`font-medium transition-all hover:text-accent ${
+                    activeSection === 'admin' ? 'text-accent' : 'text-foreground/70'
+                  }`}
+                >
+                  <Icon name="BarChart3" size={18} className="inline mr-1" />
+                  Статистика
+                </button>
+              )}
             </div>
             <div className="flex gap-2">
               <Button 
@@ -261,6 +275,16 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
                 <Icon name="Heart" size={18} className="mr-2" />
                 Поддержать
               </Button>
+              {!isAdmin && (
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAdminPanel(true)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <Icon name="Settings" size={18} />
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -418,6 +442,155 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
               </Card>
             </div>
           </div>
+        </section>
+      )}
+
+      {activeSection === 'admin' && isAdmin && (
+        <section className="container mx-auto px-4 py-20 animate-fade-in">
+          <h2 className="text-4xl font-bold text-center mb-12 flex items-center justify-center gap-3">
+            <Icon name="BarChart3" size={36} className="text-accent" />
+            Статистика доходов
+          </h2>
+          
+          <div className="grid md:grid-cols-4 gap-6 mb-8">
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-2">
+                <Icon name="TrendingUp" size={24} className="text-primary" />
+                <span className="text-sm text-muted-foreground">Сегодня</span>
+              </div>
+              <div className="text-3xl font-bold">2,450₽</div>
+              <div className="text-xs text-green-600 mt-1">+18% от вчера</div>
+            </Card>
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-2">
+                <Icon name="Calendar" size={24} className="text-secondary" />
+                <span className="text-sm text-muted-foreground">Этот месяц</span>
+              </div>
+              <div className="text-3xl font-bold">64,890₽</div>
+              <div className="text-xs text-green-600 mt-1">+24% от пред. месяца</div>
+            </Card>
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-2">
+                <Icon name="Crown" size={24} className="text-accent" />
+                <span className="text-sm text-muted-foreground">Premium подписок</span>
+              </div>
+              <div className="text-3xl font-bold">47</div>
+              <div className="text-xs text-muted-foreground mt-1">Активных</div>
+            </Card>
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-2">
+                <Icon name="Heart" size={24} className="text-primary" />
+                <span className="text-sm text-muted-foreground">Донаты</span>
+              </div>
+              <div className="text-3xl font-bold">8,200₽</div>
+              <div className="text-xs text-muted-foreground mt-1">За месяц</div>
+            </Card>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <Card className="p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Icon name="DollarSign" size={24} className="text-primary" />
+                Источники дохода
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span>Premium подписки</span>
+                    <span className="font-bold">42,300₽</span>
+                  </div>
+                  <div className="w-full bg-muted h-3 rounded-full overflow-hidden">
+                    <div className="bg-gradient-to-r from-accent to-secondary h-full" style={{ width: '65%' }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span>Реклама</span>
+                    <span className="font-bold">14,390₽</span>
+                  </div>
+                  <div className="w-full bg-muted h-3 rounded-full overflow-hidden">
+                    <div className="bg-gradient-to-r from-primary to-secondary h-full" style={{ width: '22%' }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span>Донаты</span>
+                    <span className="font-bold">8,200₽</span>
+                  </div>
+                  <div className="w-full bg-muted h-3 rounded-full overflow-hidden">
+                    <div className="bg-primary h-full" style={{ width: '13%' }}></div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Icon name="Users" size={24} className="text-secondary" />
+                Активность пользователей
+              </h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span>Всего пользователей</span>
+                  <span className="text-2xl font-bold">5,247</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between items-center">
+                  <span>Premium пользователей</span>
+                  <span className="text-xl font-bold text-accent">47 (0.9%)</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between items-center">
+                  <span>Просмотров за месяц</span>
+                  <span className="text-xl font-bold">142,891</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between items-center">
+                  <span>Средний чек</span>
+                  <span className="text-xl font-bold">1,237₽</span>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <Card className="p-6">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Icon name="CreditCard" size={24} className="text-accent" />
+              Последние транзакции
+            </h3>
+            <div className="space-y-3">
+              {[
+                { type: 'premium', user: 'Анна К.', amount: 490, date: '14 дек, 15:34' },
+                { type: 'donate', user: 'Мария С.', amount: 300, date: '14 дек, 14:12' },
+                { type: 'premium', user: 'Елена Н.', amount: 2990, date: '14 дек, 11:45', plan: 'Годовая' },
+                { type: 'donate', user: 'Ольга В.', amount: 500, date: '13 дек, 22:18' },
+                { type: 'ad', user: 'Рекламодатель', amount: 5000, date: '13 дек, 18:00' }
+              ].map((transaction, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      transaction.type === 'premium' ? 'bg-accent/20' :
+                      transaction.type === 'donate' ? 'bg-primary/20' : 'bg-secondary/20'
+                    }`}>
+                      <Icon 
+                        name={transaction.type === 'premium' ? 'Crown' : transaction.type === 'donate' ? 'Heart' : 'Megaphone'} 
+                        size={20}
+                        className={transaction.type === 'premium' ? 'text-accent' : transaction.type === 'donate' ? 'text-primary' : 'text-secondary'}
+                      />
+                    </div>
+                    <div>
+                      <div className="font-semibold">{transaction.user}</div>
+                      <div className="text-sm text-muted-foreground">{transaction.date}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-green-600">+{transaction.amount}₽</div>
+                    {transaction.plan && <div className="text-xs text-muted-foreground">{transaction.plan}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         </section>
       )}
 
@@ -660,13 +833,14 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
             </Card>
             <Button 
               onClick={() => {
+                window.open('https://yookassa.ru/integration', '_blank');
                 setIsPremiumUser(true);
                 setShowPremiumDialog(false);
               }}
               className="w-full bg-gradient-to-r from-accent to-secondary hover:opacity-90 text-lg h-12"
             >
-              <Icon name="Crown" size={20} className="mr-2" />
-              Оформить Premium
+              <Icon name="CreditCard" size={20} className="mr-2" />
+              Оплатить через ЮKassa
             </Button>
             <p className="text-xs text-muted-foreground text-center">
               Отменить подписку можно в любой момент
@@ -712,9 +886,15 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
                 <Badge variant="secondary" className="text-sm">Boosty</Badge>
               </div>
             </div>
-            <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-lg h-12">
-              <Icon name="Heart" size={20} className="mr-2" />
-              Поддержать
+            <Button 
+              onClick={() => {
+                window.open('https://yoomoney.ru/', '_blank');
+                setShowDonateDialog(false);
+              }}
+              className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-lg h-12"
+            >
+              <Icon name="CreditCard" size={20} className="mr-2" />
+              Перейти к оплате
             </Button>
             <p className="text-xs text-muted-foreground text-center">
               Спасибо за вашу щедрость! ❤️
@@ -758,6 +938,47 @@ ${selectedRecipe.steps.map((step, i) => `Шаг ${i + 1}: ${step}`).join('\n\n')
           </Card>
         </div>
       )}
+
+      <Dialog open={showAdminPanel} onOpenChange={setShowAdminPanel}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <Icon name="Lock" size={24} className="text-accent" />
+              Вход в админ-панель
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Пароль</label>
+              <Input 
+                type="password" 
+                placeholder="Введите пароль администратора"
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+              />
+            </div>
+            <Button 
+              onClick={() => {
+                if (adminPassword === 'admin123') {
+                  setIsAdmin(true);
+                  setActiveSection('admin');
+                  setShowAdminPanel(false);
+                  setAdminPassword('');
+                } else {
+                  alert('Неверный пароль!');
+                }
+              }}
+              className="w-full bg-gradient-to-r from-accent to-secondary hover:opacity-90"
+            >
+              <Icon name="LogIn" size={18} className="mr-2" />
+              Войти
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Демо-пароль: admin123
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <footer className="border-t border-border mt-20">
         <div className="container mx-auto px-4 py-8 text-center">
