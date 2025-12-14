@@ -2,46 +2,123 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
-interface GalleryItem {
+interface Recipe {
   id: number;
   image: string;
   title: string;
   description: string;
   category: string;
+  difficulty: string;
+  time: string;
+  servings: number;
+  ingredients: string[];
+  steps: string[];
 }
 
-const galleryItems: GalleryItem[] = [
+const recipes: Recipe[] = [
   {
     id: 1,
     image: 'https://cdn.poehali.dev/projects/785d6b87-51fe-4957-a43c-1aee2f93240c/files/f935773d-2b54-4f60-816e-d81007ab1623.jpg',
-    title: 'Элегантный свадебный торт',
-    description: 'Нежный розовый торт с золотыми украшениями и флористическими узорами. Идеален для особых торжеств.',
-    category: 'Торты'
+    title: 'Элегантный розовый торт',
+    description: 'Нежный бисквитный торт с кремом из маскарпоне и ягодами. Идеален для особых случаев.',
+    category: 'Торты',
+    difficulty: 'Сложный',
+    time: '3 часа',
+    servings: 12,
+    ingredients: [
+      '6 яиц',
+      '200 г сахара',
+      '200 г муки',
+      '500 г маскарпоне',
+      '300 мл сливок 33%',
+      '150 г сахарной пудры',
+      'Ванильный экстракт',
+      'Пищевой краситель розовый',
+      'Свежие ягоды для украшения'
+    ],
+    steps: [
+      'Разогрейте духовку до 180°C. Взбейте яйца с сахаром до пышной пены.',
+      'Аккуратно вмешайте просеянную муку. Выпекайте бисквит 35-40 минут.',
+      'Взбейте маскарпоне со сливками и сахарной пудрой до устойчивых пиков.',
+      'Разделите крем на части, одну окрасьте в розовый цвет.',
+      'Разрежьте остывший бисквит на 3 коржа. Пропитайте сиропом.',
+      'Соберите торт, чередуя коржи и крем. Покройте торт кремом.',
+      'Украсьте торт розами из крема и свежими ягодами. Охладите 2 часа.'
+    ]
   },
   {
     id: 2,
     image: 'https://cdn.poehali.dev/projects/785d6b87-51fe-4957-a43c-1aee2f93240c/files/ee399e28-5d6c-4a05-9923-f644b2839004.jpg',
     title: 'Французские макаруны',
-    description: 'Яркие и воздушные макаруны в пастельных тонах. Разнообразие вкусов и идеальная текстура.',
-    category: 'Десерты'
+    description: 'Воздушные миндальные печенья с нежной начинкой. Классика французской кондитерской.',
+    category: 'Десерты',
+    difficulty: 'Сложный',
+    time: '2 часа',
+    servings: 30,
+    ingredients: [
+      '200 г миндальной муки',
+      '200 г сахарной пудры',
+      '150 г яичных белков (комнатной температуры)',
+      '200 г сахара',
+      '50 мл воды',
+      'Пищевые красители',
+      'Для ганаша: 200 г шоколада, 150 мл сливок'
+    ],
+    steps: [
+      'Просейте миндальную муку и сахарную пудру. Смешайте с половиной белков.',
+      'Сварите сироп из сахара и воды до 118°C. Взбейте вторую половину белков.',
+      'Влейте горячий сироп в белки тонкой струйкой, продолжая взбивать.',
+      'Смешайте меренгу с миндальной массой методом макаронаж.',
+      'Отсадите макаруны на противень. Подсушите 30 минут до образования корочки.',
+      'Выпекайте при 150°C 12-15 минут. Приготовьте ганаш.',
+      'Склейте половинки макарунов ганашем. Выдержите в холодильнике сутки.'
+    ]
   },
   {
     id: 3,
     image: 'https://cdn.poehali.dev/projects/785d6b87-51fe-4957-a43c-1aee2f93240c/files/e5d267e3-dbc0-4346-a6c4-426e10cbcb39.jpg',
     title: 'Шоколадный торт премиум',
-    description: 'Роскошный шоколадный торт с ганашем, золотыми листьями и свежими ягодами.',
-    category: 'Торты'
+    description: 'Роскошный многослойный торт с темным шоколадом, ганашем и ягодами.',
+    category: 'Торты',
+    difficulty: 'Средний',
+    time: '2.5 часа',
+    servings: 10,
+    ingredients: [
+      '200 г темного шоколада 70%',
+      '200 г сливочного масла',
+      '5 яиц',
+      '150 г сахара',
+      '100 г муки',
+      '50 г какао',
+      'Для ганаша: 300 г шоколада, 200 мл сливок',
+      'Свежие ягоды',
+      'Золотые хлопья для декора'
+    ],
+    steps: [
+      'Растопите шоколад с маслом на водяной бане.',
+      'Взбейте яйца с сахаром. Добавьте шоколадную массу.',
+      'Вмешайте просеянную муку и какао. Выпекайте при 180°C 25-30 минут.',
+      'Приготовьте ганаш: доведите сливки до кипения, залейте шоколад.',
+      'Разрежьте торт на 2-3 коржа. Пропитайте кофейным сиропом.',
+      'Промажьте коржи ганашем, соберите торт.',
+      'Покройте торт ганашем, украсьте ягодами и золотыми хлопьями.'
+    ]
   }
 ];
 
+const categories = ['Все', 'Торты', 'Десерты', 'Выпечка', 'Крем'];
+
 const Index = () => {
-  const [activeSection, setActiveSection] = useState('home');
-  const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
-  const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('recipes');
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('Все');
+
+  const filteredRecipes = selectedCategory === 'Все' 
+    ? recipes 
+    : recipes.filter(recipe => recipe.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
@@ -49,10 +126,10 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Sweet Dreams
+              Sweet Kitchen
             </h1>
             <div className="hidden md:flex gap-6">
-              {['home', 'gallery', 'recipes', 'about', 'contact'].map((section) => (
+              {['recipes', 'about', 'contact'].map((section) => (
                 <button
                   key={section}
                   onClick={() => setActiveSection(section)}
@@ -60,95 +137,90 @@ const Index = () => {
                     activeSection === section ? 'text-primary' : 'text-foreground/70'
                   }`}
                 >
-                  {section === 'home' && 'Главная'}
-                  {section === 'gallery' && 'Галерея'}
                   {section === 'recipes' && 'Рецепты'}
-                  {section === 'about' && 'О мне'}
+                  {section === 'about' && 'О блоге'}
                   {section === 'contact' && 'Контакты'}
                 </button>
               ))}
             </div>
-            <Button onClick={() => setIsOrderDialogOpen(true)} className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
-              <Icon name="ShoppingCart" size={18} className="mr-2" />
-              Заказать
+            <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
+              <Icon name="BookPlus" size={18} className="mr-2" />
+              Добавить рецепт
             </Button>
           </div>
         </div>
       </nav>
 
-      {activeSection === 'home' && (
+      {activeSection === 'recipes' && (
         <main className="animate-fade-in">
           <section className="container mx-auto px-4 py-20 text-center">
             <div className="max-w-4xl mx-auto space-y-6">
               <h2 className="text-6xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-scale-in">
-                Авторские кондитерские шедевры
+                Кондитерские рецепты
               </h2>
               <p className="text-xl text-muted-foreground">
-                Создаю уникальные торты и десерты, которые превращают каждый праздник в незабываемое событие
+                Проверенные рецепты тортов и десертов с пошаговыми инструкциями
               </p>
-              <div className="flex gap-4 justify-center pt-6">
-                <Button 
-                  onClick={() => setActiveSection('gallery')} 
-                  size="lg"
-                  className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-lg"
-                >
-                  <Icon name="Sparkles" size={20} className="mr-2" />
-                  Посмотреть работы
-                </Button>
-                <Button 
-                  onClick={() => setIsOrderDialogOpen(true)}
-                  size="lg" 
-                  variant="outline"
-                  className="text-lg border-2 border-primary hover:bg-primary/10"
-                >
-                  <Icon name="MessageCircle" size={20} className="mr-2" />
-                  Обсудить заказ
-                </Button>
-              </div>
             </div>
           </section>
 
-          <section className="container mx-auto px-4 py-16">
-            <div className="grid md:grid-cols-3 gap-8">
-              {galleryItems.map((item, index) => (
-                <Card 
-                  key={item.id} 
-                  className="group cursor-pointer overflow-hidden hover:shadow-2xl transition-all duration-300 animate-fade-in border-2 hover:border-primary"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                  onClick={() => setSelectedItem(item)}
+          <section className="container mx-auto px-4 pb-8">
+            <div className="flex gap-3 justify-center flex-wrap">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? 'default' : 'outline'}
+                  onClick={() => setSelectedCategory(category)}
+                  className={selectedCategory === category ? 'bg-gradient-to-r from-primary to-secondary' : ''}
                 >
-                  <div className="relative overflow-hidden aspect-square">
-                    <img 
-                      src={item.image} 
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute bottom-4 left-4 right-4 text-white">
-                        <p className="text-sm font-semibold">{item.category}</p>
-                        <h3 className="text-xl font-bold">{item.title}</h3>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
+                  {category}
+                </Button>
               ))}
             </div>
           </section>
 
-          <section className="container mx-auto px-4 py-16">
-            <div className="grid md:grid-cols-4 gap-6 text-center">
-              {[
-                { icon: 'Award', text: 'Премиум качество', desc: 'Только натуральные ингредиенты' },
-                { icon: 'Sparkles', text: 'Уникальный дизайн', desc: 'Индивидуальный подход к каждому заказу' },
-                { icon: 'Clock', text: 'Точно в срок', desc: 'Своевременная доставка' },
-                { icon: 'Heart', text: 'С любовью', desc: 'Каждое изделие создается с душой' }
-              ].map((feature, index) => (
-                <Card key={index} className="p-6 hover:shadow-lg transition-shadow animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                    <Icon name={feature.icon as any} size={32} className="text-white" />
+          <section className="container mx-auto px-4 pb-20">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredRecipes.map((recipe, index) => (
+                <Card 
+                  key={recipe.id}
+                  className="group cursor-pointer overflow-hidden hover:shadow-2xl transition-all duration-300 animate-scale-in border-2 hover:border-primary"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                  onClick={() => setSelectedRecipe(recipe)}
+                >
+                  <div className="relative overflow-hidden aspect-[4/3]">
+                    <img 
+                      src={recipe.image} 
+                      alt={recipe.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute top-4 left-4 right-4 flex justify-between">
+                      <Badge className="bg-accent text-accent-foreground">
+                        {recipe.category}
+                      </Badge>
+                      <Badge variant="secondary" className="bg-white/90">
+                        <Icon name="Clock" size={14} className="mr-1" />
+                        {recipe.time}
+                      </Badge>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-lg mb-2">{feature.text}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.desc}</p>
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{recipe.title}</h3>
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{recipe.description}</p>
+                    <div className="flex gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Icon name="ChefHat" size={16} />
+                        <span>{recipe.difficulty}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Icon name="Users" size={16} />
+                        <span>{recipe.servings} порций</span>
+                      </div>
+                    </div>
+                    <Button variant="ghost" className="mt-4 w-full text-primary hover:text-secondary">
+                      Смотреть рецепт <Icon name="ArrowRight" size={18} className="ml-2" />
+                    </Button>
+                  </CardContent>
                 </Card>
               ))}
             </div>
@@ -156,72 +228,36 @@ const Index = () => {
         </main>
       )}
 
-      {activeSection === 'gallery' && (
-        <section className="container mx-auto px-4 py-20 animate-fade-in">
-          <h2 className="text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Галерея работ
-          </h2>
-          <p className="text-center text-muted-foreground mb-12 text-lg">
-            Каждое изделие — уникальное произведение кондитерского искусства
-          </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {galleryItems.map((item, index) => (
-              <Card 
-                key={item.id}
-                className="group cursor-pointer overflow-hidden hover:shadow-2xl transition-all duration-300 animate-scale-in border-2 hover:border-secondary"
-                style={{ animationDelay: `${index * 100}ms` }}
-                onClick={() => setSelectedItem(item)}
-              >
-                <div className="relative overflow-hidden aspect-square">
-                  <img 
-                    src={item.image} 
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute top-4 right-4">
-                    <span className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-sm font-semibold">
-                      {item.category}
-                    </span>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
-                  <p className="text-muted-foreground line-clamp-2">{item.description}</p>
-                  <Button variant="ghost" className="mt-4 text-primary hover:text-secondary">
-                    Подробнее <Icon name="ArrowRight" size={18} className="ml-2" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {activeSection === 'recipes' && (
-        <section className="container mx-auto px-4 py-20 animate-fade-in text-center">
-          <Icon name="BookOpen" size={64} className="mx-auto mb-6 text-primary" />
-          <h2 className="text-4xl font-bold mb-4">Рецепты</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Скоро здесь появятся мои любимые рецепты и секреты кондитерского мастерства
-          </p>
-        </section>
-      )}
-
       {activeSection === 'about' && (
         <section className="container mx-auto px-4 py-20 animate-fade-in">
           <div className="max-w-3xl mx-auto text-center space-y-6">
             <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <Icon name="User" size={48} className="text-white" />
+              <Icon name="Cookie" size={48} className="text-white" />
             </div>
-            <h2 className="text-4xl font-bold">О мне</h2>
+            <h2 className="text-4xl font-bold">О блоге</h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Я — кондитер с многолетним опытом создания авторских десертов. Каждое изделие делаю с любовью 
-              и вниманием к деталям. Моя цель — сделать ваш праздник незабываемым через вкус и визуальную красоту.
+              Добро пожаловать в мой кондитерский блог! Здесь я делюсь проверенными рецептами 
+              тортов, десертов и выпечки. Каждый рецепт протестирован и содержит подробные 
+              пошаговые инструкции.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Использую только натуральные ингредиенты премиум-класса. Постоянно совершенствую навыки 
-              и слежу за мировыми трендами в кондитерском искусстве.
+              Я — профессиональный кондитер с 10-летним опытом. Моя цель — сделать кондитерское 
+              искусство доступным для каждого, кто любит создавать вкусные десерты дома.
             </p>
+            <div className="grid md:grid-cols-3 gap-6 pt-8">
+              <Card className="p-6">
+                <div className="text-4xl font-bold text-primary mb-2">150+</div>
+                <p className="text-muted-foreground">Рецептов</p>
+              </Card>
+              <Card className="p-6">
+                <div className="text-4xl font-bold text-secondary mb-2">50K+</div>
+                <p className="text-muted-foreground">Читателей</p>
+              </Card>
+              <Card className="p-6">
+                <div className="text-4xl font-bold text-accent mb-2">10</div>
+                <p className="text-muted-foreground">Лет опыта</p>
+              </Card>
+            </div>
           </div>
         </section>
       )}
@@ -234,29 +270,29 @@ const Index = () => {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Phone" size={24} className="text-primary" />
+                    <Icon name="Mail" size={24} className="text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Телефон</h3>
-                    <p className="text-muted-foreground">+7 (999) 123-45-67</p>
+                    <h3 className="font-semibold mb-1">Email</h3>
+                    <p className="text-muted-foreground">recipes@sweetkitchen.ru</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Mail" size={24} className="text-secondary" />
+                    <Icon name="Instagram" size={24} className="text-secondary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-muted-foreground">sweet@dreams.ru</p>
+                    <h3 className="font-semibold mb-1">Instagram</h3>
+                    <p className="text-muted-foreground">@sweet_kitchen_recipes</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Instagram" size={24} className="text-accent-foreground" />
+                    <Icon name="Youtube" size={24} className="text-accent-foreground" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Instagram</h3>
-                    <p className="text-muted-foreground">@sweet_dreams_cakes</p>
+                    <h3 className="font-semibold mb-1">YouTube</h3>
+                    <p className="text-muted-foreground">Sweet Kitchen</p>
                   </div>
                 </div>
               </div>
@@ -265,71 +301,93 @@ const Index = () => {
         </section>
       )}
 
-      <Dialog open={selectedItem !== null} onOpenChange={() => setSelectedItem(null)}>
-        <DialogContent className="max-w-3xl">
-          {selectedItem && (
-            <div className="space-y-4">
+      <Dialog open={selectedRecipe !== null} onOpenChange={() => setSelectedRecipe(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {selectedRecipe && (
+            <div className="space-y-6">
               <DialogHeader>
-                <DialogTitle className="text-2xl">{selectedItem.title}</DialogTitle>
+                <DialogTitle className="text-3xl">{selectedRecipe.title}</DialogTitle>
               </DialogHeader>
+              
               <img 
-                src={selectedItem.image} 
-                alt={selectedItem.title}
-                className="w-full h-96 object-cover rounded-lg"
+                src={selectedRecipe.image} 
+                alt={selectedRecipe.title}
+                className="w-full h-80 object-cover rounded-lg"
               />
-              <div className="space-y-2">
-                <span className="inline-block bg-accent text-accent-foreground px-3 py-1 rounded-full text-sm font-semibold">
-                  {selectedItem.category}
-                </span>
-                <p className="text-muted-foreground">{selectedItem.description}</p>
+              
+              <div className="flex gap-4 flex-wrap">
+                <Badge className="bg-accent text-accent-foreground">{selectedRecipe.category}</Badge>
+                <Badge variant="secondary">
+                  <Icon name="Clock" size={14} className="mr-1" />
+                  {selectedRecipe.time}
+                </Badge>
+                <Badge variant="secondary">
+                  <Icon name="ChefHat" size={14} className="mr-1" />
+                  {selectedRecipe.difficulty}
+                </Badge>
+                <Badge variant="secondary">
+                  <Icon name="Users" size={14} className="mr-1" />
+                  {selectedRecipe.servings} порций
+                </Badge>
               </div>
-              <Button 
-                onClick={() => {
-                  setSelectedItem(null);
-                  setIsOrderDialogOpen(true);
-                }}
-                className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-              >
-                <Icon name="ShoppingCart" size={18} className="mr-2" />
-                Заказать похожий торт
-              </Button>
+
+              <p className="text-muted-foreground text-lg">{selectedRecipe.description}</p>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Icon name="ShoppingBasket" size={24} className="text-primary" />
+                    Ингредиенты
+                  </h3>
+                  <ul className="space-y-2">
+                    {selectedRecipe.ingredients.map((ingredient, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <Icon name="Check" size={18} className="text-primary mt-0.5 flex-shrink-0" />
+                        <span>{ingredient}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Icon name="List" size={24} className="text-secondary" />
+                    Приготовление
+                  </h3>
+                  <ol className="space-y-3">
+                    {selectedRecipe.steps.map((step, index) => (
+                      <li key={index} className="flex gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-bold flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <span className="pt-1">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90">
+                  <Icon name="Heart" size={18} className="mr-2" />
+                  В избранное
+                </Button>
+                <Button variant="outline" className="flex-1">
+                  <Icon name="Share2" size={18} className="mr-2" />
+                  Поделиться
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isOrderDialogOpen} onOpenChange={setIsOrderDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">Оформить заказ</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Имя</label>
-              <Input placeholder="Ваше имя" />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Телефон</label>
-              <Input placeholder="+7 (999) 123-45-67" />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Описание заказа</label>
-              <Textarea placeholder="Расскажите, какой торт вы хотите заказать..." rows={4} />
-            </div>
-            <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90">
-              <Icon name="Send" size={18} className="mr-2" />
-              Отправить заявку
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       <footer className="border-t border-border mt-20">
         <div className="container mx-auto px-4 py-8 text-center">
-          <p className="text-muted-foreground">© 2024 Sweet Dreams. Все права защищены.</p>
+          <p className="text-muted-foreground">© 2024 Sweet Kitchen. Все права защищены.</p>
           <div className="flex gap-4 justify-center mt-4">
             <Icon name="Instagram" size={24} className="text-muted-foreground hover:text-primary cursor-pointer transition-colors" />
-            <Icon name="Facebook" size={24} className="text-muted-foreground hover:text-primary cursor-pointer transition-colors" />
+            <Icon name="Youtube" size={24} className="text-muted-foreground hover:text-primary cursor-pointer transition-colors" />
             <Icon name="Mail" size={24} className="text-muted-foreground hover:text-primary cursor-pointer transition-colors" />
           </div>
         </div>
